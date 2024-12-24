@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import ResizableText from './ResizableText';
+import ResizableText from '../../shared/text/ResizableText';
 
 interface LayeredImageTextProps {
   originalImage: string;
@@ -31,7 +31,6 @@ export default function LayeredImageText({
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
-    // Load original image to get dimensions
     const img = new Image();
     img.onload = () => {
       setImageSize({ width: img.width, height: img.height });
@@ -43,10 +42,14 @@ export default function LayeredImageText({
     if (containerRef.current) {
       const updateSize = () => {
         const rect = containerRef.current?.getBoundingClientRect();
-        setContainerSize({
-          width: rect?.width || 0,
-          height: (rect?.width || 0) * (imageSize.height / imageSize.width),
-        });
+        if (rect) {
+          const aspectRatio = imageSize.height / imageSize.width;
+          const height = rect.width * aspectRatio;
+          setContainerSize({
+            width: rect.width,
+            height: height,
+          });
+        }
       };
 
       updateSize();
@@ -58,7 +61,7 @@ export default function LayeredImageText({
   return (
     <div 
       ref={containerRef} 
-      className="relative w-full"
+      className="relative w-full overflow-hidden"
       style={{ 
         aspectRatio: `${imageSize.width}/${imageSize.height}`,
         maxHeight: '600px'
@@ -73,15 +76,17 @@ export default function LayeredImageText({
         />
       </div>
 
-      {/* Text layer */}
-      <ResizableText
-        text={text}
-        position={position}
-        style={style}
-        containerSize={containerSize}
-        onStyleChange={onStyleChange || (() => {})}
-        onPositionChange={onPositionChange || (() => {})}
-      />
+      {/* Text layer with overflow control */}
+      <div className="absolute inset-0 overflow-hidden">
+        <ResizableText
+          text={text}
+          position={position}
+          style={style}
+          containerSize={containerSize}
+          onStyleChange={onStyleChange || (() => {})}
+          onPositionChange={onPositionChange || (() => {})}
+        />
+      </div>
 
       {/* Top layer with transparent background image */}
       <div className="absolute inset-0 pointer-events-none">

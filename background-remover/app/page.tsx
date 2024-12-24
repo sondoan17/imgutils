@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import Navbar from './components/Navbar';
-import ImageUploader from './components/ImageUploader';
-import TextBehind from './components/TextBehind';
+import Navbar from './components/shared/layout/Navbar';
+import ImageUploader from './components/features/bg-removal/ImageUploader';
+import TextBehind from './components/features/text-behind/TextBehind';
 
 export default function Home() {
   const [activeFeature, setActiveFeature] = useState('remove-bg');

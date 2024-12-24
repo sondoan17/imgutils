@@ -3,9 +3,8 @@
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import axios from 'axios';
-import TextCustomizer from './TextCustomize';
-import ImageWithText from './ImageWithTextProps';
-import TextOverlay from './TextOverlay';
+import TextCustomizer from '../../shared/text/TextCustomize';
+import TextOverlay from '../../shared/text/TextOverlay';
 import ImageTextPreview from './ImageTextPreview';
 
 const ImageUploader = () => {
