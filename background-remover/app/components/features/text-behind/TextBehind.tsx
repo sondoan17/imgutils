@@ -6,6 +6,7 @@ import axios from 'axios';
 import TextOverlay from '../../shared/text/TextOverlay';
 import ResizableText from '../../shared/text/ResizableText';
 
+
 interface TextLayer {
   id: string;
   text: string;
@@ -79,7 +80,7 @@ export default function TextBehind() {
   };
 
   const handleDownload = async () => {
-    if (!canvasRef.current || !originalImage || !processedImage) return;
+    if (!canvasRef.current || !originalImage || !processedImage || !imageSize) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -101,19 +102,28 @@ export default function TextBehind() {
 
     // Draw text layers
     textLayers.forEach(layer => {
-      // Configure text style
-      ctx.font = `bold ${layer.style.fontSize}px Arial`;
+      ctx.save();
+      
+      // Calculate the scale factor between preview container and actual image
+      const containerWidth = containerRef.current?.clientWidth || 1;
+      const scaleFactor = canvas.width / containerWidth;
+      
+      // Configure text style with properly scaled font size
+      const fontSize = layer.style.fontSize * scaleFactor;
+      ctx.font = `bold ${fontSize}px Arial`;
       ctx.fillStyle = layer.style.color;
       ctx.globalAlpha = layer.style.opacity;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
+      ctx.letterSpacing = '0.1em';
       
-      // Calculate actual pixel positions
-      const x = (layer.position.x / 100) * canvas.width;
-      const y = (layer.position.y / 100) * canvas.height;
+      // Calculate positions (matching the preview positioning)
+      const x = canvas.width * (layer.position.x / 100);
+      const y = canvas.height * (layer.position.y / 100);
       
       // Draw text
       ctx.fillText(layer.text, x, y);
+      ctx.restore();
     });
 
     // Reset global alpha before drawing processed image
@@ -140,8 +150,12 @@ export default function TextBehind() {
     });
   };
 
+  const handleRemoveText = (id: string) => {
+    setTextLayers(prev => prev.filter(layer => layer.id !== id));
+  };
+
   return (
-    <div className="max-w-2xl mx-auto p-4">
+    <div className="max-w-4xl mx-auto p-4">
       <div {...getRootProps()} className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400">
         <input {...getInputProps()} />
         {isDragActive ? (
@@ -153,59 +167,55 @@ export default function TextBehind() {
 
       {originalImage && processedImage && (
         <div className="mt-8 space-y-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="border rounded-lg p-4">
-              <h3 className="text-lg font-semibold mb-2">Original Image</h3>
-              <img src={originalImage} alt="Original" className="w-full h-auto rounded" />
-            </div>
-            <div className="border rounded-lg p-4">
-              <h3 className="text-lg font-semibold mb-2">Preview</h3>
-              <div 
-                ref={containerRef}
-                className="relative w-full overflow-hidden"
-                style={{ 
-                  aspectRatio: imageSize ? `${imageSize.width}/${imageSize.height}` : 'auto'
+          <div className="border rounded-lg p-4">
+            <h3 className="text-lg font-semibold mb-2">Preview</h3>
+            <div 
+              ref={containerRef}
+              className="relative w-full overflow-hidden"
+              style={{ 
+                aspectRatio: imageSize ? `${imageSize.width}/${imageSize.height}` : 'auto',
+                maxHeight: '800px'
+              }}
+            >
+              <img 
+                src={originalImage} 
+                alt="Base" 
+                className="w-full h-full object-contain"
+                onLoad={(e) => {
+                  const img = e.target as HTMLImageElement;
+                  setImageSize({ width: img.naturalWidth, height: img.naturalHeight });
                 }}
-              >
-                <img 
-                  src={originalImage} 
-                  alt="Base" 
-                  className="w-full h-full object-contain"
-                  onLoad={(e) => {
-                    const img = e.target as HTMLImageElement;
-                    setImageSize({ width: img.naturalWidth, height: img.naturalHeight });
-                  }}
-                />
-                <div className="absolute inset-0 overflow-hidden">
-                  {textLayers.map(layer => (
-                    <ResizableText
-                      key={layer.id}
-                      text={layer.text}
-                      position={layer.position}
-                      style={layer.style}
-                      containerSize={{
-                        width: containerRef.current?.clientWidth || 0,
-                        height: containerRef.current?.clientHeight || 0
-                      }}
-                      onStyleChange={(newStyle) => {
-                        setTextLayers(prev => prev.map(l => 
-                          l.id === layer.id ? { ...l, style: newStyle } : l
-                        ));
-                      }}
-                      onPositionChange={(newPosition) => {
-                        setTextLayers(prev => prev.map(l => 
-                          l.id === layer.id ? { ...l, position: newPosition } : l
-                        ));
-                      }}
-                    />
-                  ))}
-                </div>
-                <img
-                  src={processedImage}
-                  alt="Overlay"
-                  className="absolute inset-0 w-full h-full object-contain pointer-events-none"
-                />
+              />
+              <div className="absolute inset-0 overflow-hidden">
+                {textLayers.map(layer => (
+                  <ResizableText
+                    key={layer.id}
+                    text={layer.text}
+                    position={layer.position}
+                    style={layer.style}
+                    containerSize={{
+                      width: containerRef.current?.clientWidth || 0,
+                      height: containerRef.current?.clientHeight || 0
+                    }}
+                    onStyleChange={(newStyle) => {
+                      setTextLayers(prev => prev.map(l => 
+                        l.id === layer.id ? { ...l, style: newStyle } : l
+                      ));
+                    }}
+                    onPositionChange={(newPosition) => {
+                      setTextLayers(prev => prev.map(l => 
+                        l.id === layer.id ? { ...l, position: newPosition } : l
+                      ));
+                    }}
+                    onRemove={() => handleRemoveText(layer.id)}
+                  />
+                ))}
               </div>
+              <img
+                src={processedImage}
+                alt="Overlay"
+                className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+              />
             </div>
           </div>
 

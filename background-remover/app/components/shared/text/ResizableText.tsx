@@ -13,6 +13,7 @@ interface ResizableTextProps {
   containerSize: { width: number; height: number };
   onStyleChange: (newStyle: { fontSize: number; color: string; opacity: number }) => void;
   onPositionChange: (position: { x: number; y: number }) => void;
+  onRemove?: () => void;
 }
 
 export default function ResizableText({
@@ -22,6 +23,7 @@ export default function ResizableText({
   containerSize,
   onStyleChange,
   onPositionChange,
+  onRemove,
 }: ResizableTextProps) {
   const textRef = useRef<HTMLDivElement>(null);
   const [isResizing, setIsResizing] = useState(false);
@@ -96,6 +98,17 @@ export default function ResizableText({
       }}
       onMouseDown={handleMouseDown}
     >
+      {onRemove && (
+        <button
+          className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full text-white opacity-0 group-hover:opacity-75 flex items-center justify-center text-xs"
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
+        >
+          ×
+        </button>
+      )}
       <div
         style={{
           fontSize: `${style.fontSize}px`,
