@@ -19,6 +19,12 @@ interface TextLayer {
   };
 }
 
+interface TextStyle {
+  fontSize: number;
+  color: string;
+  opacity: number;
+}
+
 export default function TextBehind() {
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
@@ -70,7 +76,7 @@ export default function TextBehind() {
     maxSize: 5242880
   });
 
-  const handleTextOverlay = (text: string, position: { x: number, y: number }, style: any) => {
+  const handleTextOverlay = (text: string, position: { x: number, y: number }, style: TextStyle) => {
     const newLayer: TextLayer = {
       id: Date.now().toString(),
       text,

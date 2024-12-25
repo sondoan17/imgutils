@@ -14,11 +14,11 @@ interface TextStyle {
 
 export default function TextOverlay({ onApply }: TextOverlayProps) {
   const [text, setText] = useState('');
-  const [position, setPosition] = useState({ x: 50, y: 50 });
+  const [position] = useState({ x: 50, y: 50 });
   const [style, setStyle] = useState<TextStyle>({
-    fontSize: 120,
-    color: '#FFD700',
-    opacity: 0.8
+    fontSize: 48,
+    color: '#000000',
+    opacity: 0.5
   });
 
   const handleApply = () => {
