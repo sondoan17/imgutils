@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import ResizableText from '../../shared/text/ResizableText';
+import Image from 'next/image';
 
 interface LayeredImageTextProps {
   originalImage: string;
@@ -31,9 +32,9 @@ export default function LayeredImageText({
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
-    const img = new Image();
+    const img = document.createElement('img');
     img.onload = () => {
-      setImageSize({ width: img.width, height: img.height });
+      setImageSize({ width: img.naturalWidth, height: img.naturalHeight });
     };
     img.src = originalImage;
   }, [originalImage]);
@@ -69,10 +70,11 @@ export default function LayeredImageText({
     >
       {/* Base layer with original image */}
       <div className="absolute inset-0">
-        <img 
-          src={originalImage} 
-          alt="Original" 
-          className="w-full h-full object-contain"
+        <Image 
+          src={originalImage}
+          alt="Original"
+          fill
+          className="object-contain"
         />
       </div>
 
@@ -90,10 +92,11 @@ export default function LayeredImageText({
 
       {/* Top layer with transparent background image */}
       <div className="absolute inset-0 pointer-events-none">
-        <img 
-          src={processedImage} 
-          alt="Processed" 
-          className="w-full h-full object-contain"
+        <Image 
+          src={processedImage}
+          alt="Processed"
+          fill
+          className="object-contain"
         />
       </div>
     </div>

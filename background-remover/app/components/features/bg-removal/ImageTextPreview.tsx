@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 interface ImageTextPreviewProps {
   imageUrl: string;
   text: string;
@@ -32,10 +34,11 @@ export default function ImageTextPreview({ imageUrl, text, position, style }: Im
       </div>
 
       {/* Image Layer with Background Removed */}
-      <img 
-        src={imageUrl} 
-        alt="Preview" 
-        className="relative w-full h-auto"
+      <Image 
+        src={imageUrl}
+        alt="Preview"
+        fill
+        className="relative"
         style={{ 
           mixBlendMode: 'multiply',
           filter: 'contrast(1.1)',

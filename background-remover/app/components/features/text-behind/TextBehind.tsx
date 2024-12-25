@@ -5,6 +5,7 @@ import { useDropzone } from 'react-dropzone';
 import axios from 'axios';
 import TextOverlay from '../../shared/text/TextOverlay';
 import ResizableText from '../../shared/text/ResizableText';
+import Image from 'next/image';
 
 
 interface TextLayer {
@@ -143,7 +144,7 @@ export default function TextBehind() {
 
   const loadImage = (src: string): Promise<HTMLImageElement> => {
     return new Promise((resolve, reject) => {
-      const img = new Image();
+      const img = document.createElement('img');
       img.onload = () => resolve(img);
       img.onerror = reject;
       img.src = src;
@@ -177,10 +178,11 @@ export default function TextBehind() {
                 maxHeight: '800px'
               }}
             >
-              <img 
-                src={originalImage} 
-                alt="Base" 
-                className="w-full h-full object-contain"
+              <Image 
+                src={originalImage}
+                alt="Base"
+                fill
+                className="object-contain"
                 onLoad={(e) => {
                   const img = e.target as HTMLImageElement;
                   setImageSize({ width: img.naturalWidth, height: img.naturalHeight });
@@ -211,10 +213,11 @@ export default function TextBehind() {
                   />
                 ))}
               </div>
-              <img
+              <Image
                 src={processedImage}
                 alt="Overlay"
-                className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+                fill
+                className="object-contain pointer-events-none"
               />
             </div>
           </div>
