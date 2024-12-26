@@ -61,6 +61,12 @@ export default function TextBehind() {
   };
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
+    // Clear previous states
+    setProcessedImage(null);
+    setTextLayers([]);
+    setImageSize(null);
+    
+    // Set new image
     const file = acceptedFiles[0];
     const originalUrl = URL.createObjectURL(file);
     setOriginalImage(originalUrl);
