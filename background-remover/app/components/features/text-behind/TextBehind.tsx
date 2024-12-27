@@ -1,29 +1,20 @@
 'use client';
 
-import { useCallback, useState, useRef } from 'react';
+import { useCallback, useState, useRef, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import axios from 'axios';
 import TextOverlay from '../../shared/text/TextOverlay';
 import ResizableText from '../../shared/text/ResizableText';
 import Image from 'next/image';
-
+import { TextStyle, defaultTextStyle } from '@/app/types/text';
 
 interface TextLayer {
   id: string;
   text: string;
   position: { x: number; y: number };
-  style: {
-    fontSize: number;
-    color: string;
-    opacity: number;
-  };
+  style: TextStyle;
 }
 
-interface TextStyle {
-  fontSize: number;
-  color: string;
-  opacity: number;
-}
 
 export default function TextBehind() {
   const [originalImage, setOriginalImage] = useState<string | null>(null);
@@ -33,6 +24,7 @@ export default function TextBehind() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [imageSize, setImageSize] = useState<{ width: number; height: number } | null>(null);
+  const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
 
   const handleRemoveBackground = async (file: File) => {
     setLoading(true);
@@ -83,13 +75,24 @@ export default function TextBehind() {
   });
 
   const handleTextOverlay = (text: string, position: { x: number, y: number }, style: TextStyle) => {
-    const newLayer: TextLayer = {
-      id: Date.now().toString(),
-      text,
-      position,
-      style
-    };
-    setTextLayers(prev => [...prev, newLayer]);
+    if (selectedLayerId && textLayers.some(layer => layer.id === selectedLayerId)) {
+      // Only update if selected layer still exists
+      setTextLayers(prev => prev.map(layer => 
+        layer.id === selectedLayerId 
+          ? { ...layer, text, style }
+          : layer
+      ));
+    } else {
+      // Add new layer and select it
+      const newLayer: TextLayer = {
+        id: Date.now().toString(),
+        text,
+        position,
+        style
+      };
+      setTextLayers(prev => [...prev, newLayer]);
+      setSelectedLayerId(newLayer.id);
+    }
   };
 
   const handleDownload = async () => {
@@ -121,21 +124,44 @@ export default function TextBehind() {
       const containerWidth = containerRef.current?.clientWidth || 1;
       const scaleFactor = canvas.width / containerWidth;
       
-      // Configure text style with properly scaled font size
+      // Calculate positions
+      const x = canvas.width * (layer.position.x / 100);
+      const y = canvas.height * (layer.position.y / 100);
+      
+      // Configure text style
       const fontSize = layer.style.fontSize * scaleFactor;
-      ctx.font = `bold ${fontSize}px Arial`;
+      ctx.font = `${layer.style.fontWeight || 'normal'} ${fontSize}px ${layer.style.fontFamily || 'Arial'}`;
       ctx.fillStyle = layer.style.color;
       ctx.globalAlpha = layer.style.opacity;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.letterSpacing = '0.1em';
       
-      // Calculate positions (matching the preview positioning)
-      const x = canvas.width * (layer.position.x / 100);
-      const y = canvas.height * (layer.position.y / 100);
-      
-      // Draw text
+      // Reset shadow and global alpha for each layer
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+      ctx.globalAlpha = layer.style.opacity;
+
+      // Apply shadow if enabled (before any drawing operations)
+      if (layer.style.shadow?.enabled) {
+        ctx.shadowColor = layer.style.shadow.color;
+        ctx.shadowBlur = (layer.style.shadow.blur || 0) * scaleFactor;
+        ctx.shadowOffsetX = (layer.style.shadow.offsetX || 0) * scaleFactor;
+        ctx.shadowOffsetY = (layer.style.shadow.offsetY || 0) * scaleFactor;
+      }
+
+      // Draw stroke if enabled
+      if (layer.style.stroke?.enabled) {
+        ctx.strokeStyle = layer.style.stroke.color;
+        ctx.lineWidth = (layer.style.stroke.width || 1) * scaleFactor;
+        ctx.strokeText(layer.text, x, y);
+      }
+
+      // Draw text fill
+      ctx.fillStyle = layer.style.color;
       ctx.fillText(layer.text, x, y);
+      
       ctx.restore();
     });
 
@@ -167,6 +193,26 @@ export default function TextBehind() {
     setTextLayers(prev => prev.filter(layer => layer.id !== id));
   };
 
+  const handleRemoveAllText = () => {
+    setTextLayers([]);
+    setSelectedLayerId(null);  // Clear selection when removing all text
+  };
+
+  useEffect(() => {
+    const handleGlobalClick = (e: MouseEvent) => {
+      // Check if click is outside of any text layer and text controls
+      const isTextLayer = (e.target as HTMLElement).closest('.text-layer');
+      const isTextControls = (e.target as HTMLElement).closest('.text-controls');
+      
+      if (!isTextLayer && !isTextControls) {
+        setSelectedLayerId(null);
+      }
+    };
+
+    document.addEventListener('click', handleGlobalClick);
+    return () => document.removeEventListener('click', handleGlobalClick);
+  }, []);
+
   return (
     <div className="max-w-4xl mx-auto p-4">
       <div {...getRootProps()} className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400">
@@ -181,7 +227,27 @@ export default function TextBehind() {
       {originalImage && processedImage && (
         <div className="mt-8 space-y-8">
           <div className="border rounded-lg p-4">
-            <h3 className="text-lg font-semibold mb-2">Preview</h3>
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-lg font-semibold">Preview</h3>
+              <div className="flex gap-2">
+                {selectedLayerId && (
+                  <button
+                    onClick={() => setSelectedLayerId(null)}
+                    className="px-3 py-1 text-sm bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
+                  >
+                    Deselect Text
+                  </button>
+                )}
+                {textLayers.length > 0 && (
+                  <button
+                    onClick={handleRemoveAllText}
+                    className="px-3 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                  >
+                    Remove All Text
+                  </button>
+                )}
+              </div>
+            </div>
             <div 
               ref={containerRef}
               className="relative w-full overflow-hidden"
@@ -207,10 +273,12 @@ export default function TextBehind() {
                     text={layer.text}
                     position={layer.position}
                     style={layer.style}
+                    isSelected={layer.id === selectedLayerId}
                     containerSize={{
                       width: containerRef.current?.clientWidth || 0,
                       height: containerRef.current?.clientHeight || 0
                     }}
+                    onSelect={() => setSelectedLayerId(layer.id)}
                     onStyleChange={(newStyle) => {
                       setTextLayers(prev => prev.map(l => 
                         l.id === layer.id ? { ...l, style: newStyle } : l
@@ -221,7 +289,12 @@ export default function TextBehind() {
                         l.id === layer.id ? { ...l, position: newPosition } : l
                       ));
                     }}
-                    onRemove={() => handleRemoveText(layer.id)}
+                    onRemove={() => {
+                      handleRemoveText(layer.id);
+                      if (selectedLayerId === layer.id) {
+                        setSelectedLayerId(null);
+                      }
+                    }}
                   />
                 ))}
               </div>
@@ -234,7 +307,12 @@ export default function TextBehind() {
             </div>
           </div>
 
-          <TextOverlay onApply={handleTextOverlay} />
+          <TextOverlay 
+            onApply={handleTextOverlay}
+            initialText={selectedLayerId ? textLayers.find(l => l.id === selectedLayerId)?.text : ''}
+            initialStyle={selectedLayerId ? textLayers.find(l => l.id === selectedLayerId)?.style : defaultTextStyle}
+            className="text-controls"
+          />
 
           <button
             onClick={handleDownload}

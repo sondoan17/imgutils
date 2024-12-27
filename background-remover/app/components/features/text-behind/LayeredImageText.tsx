@@ -3,18 +3,15 @@
 import { useState, useRef, useEffect } from 'react';
 import ResizableText from '../../shared/text/ResizableText';
 import Image from 'next/image';
+import { TextStyle } from '@/app/types/text';
 
 interface LayeredImageTextProps {
   originalImage: string;
   processedImage: string;
   text: string;
   position: { x: number; y: number };
-  style: {
-    fontSize: number;
-    color: string;
-    opacity: number;
-  };
-  onStyleChange?: (newStyle: { fontSize: number; color: string; opacity: number }) => void;
+  style: TextStyle;
+  onStyleChange?: (newStyle: TextStyle) => void;
   onPositionChange?: (position: { x: number; y: number }) => void;
 }
 

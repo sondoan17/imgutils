@@ -1,17 +1,16 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { TextStyle } from '@/app/types/text';
 
 interface ResizableTextProps {
   text: string;
   position: { x: number; y: number };
-  style: {
-    fontSize: number;
-    color: string;
-    opacity: number;
-  };
+  style: TextStyle;
   containerSize: { width: number; height: number };
-  onStyleChange: (newStyle: { fontSize: number; color: string; opacity: number }) => void;
+  isSelected?: boolean;
+  onSelect?: () => void;
+  onStyleChange: (newStyle: TextStyle) => void;
   onPositionChange: (position: { x: number; y: number }) => void;
   onRemove?: () => void;
 }
@@ -21,6 +20,8 @@ export default function ResizableText({
   position,
   style,
   containerSize,
+  isSelected,
+  onSelect,
   onStyleChange,
   onPositionChange,
   onRemove,
@@ -89,18 +90,29 @@ export default function ResizableText({
   return (
     <div
       ref={textRef}
-      className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-move group"
+      className={`absolute transform -translate-x-1/2 -translate-y-1/2 cursor-move group text-layer ${
+        isSelected ? 'ring-2 ring-blue-500 ring-offset-2' : ''
+      }`}
       style={{
         left: `${position.x}%`,
         top: `${position.y}%`,
         maxWidth: '90%',
         userSelect: 'none',
+        padding: isSelected ? '8px' : '0',
+        borderRadius: '4px',
+        backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
       }}
       onMouseDown={handleMouseDown}
+      onClick={(e) => {
+        e.stopPropagation();
+        onSelect?.();
+      }}
     >
       {onRemove && (
         <button
-          className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full text-white opacity-0 group-hover:opacity-75 flex items-center justify-center text-xs"
+          className={`absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full text-white 
+            ${isSelected ? 'opacity-75' : 'opacity-0'} 
+            group-hover:opacity-75 flex items-center justify-center text-xs`}
           onClick={(e) => {
             e.stopPropagation();
             onRemove();
@@ -112,19 +124,28 @@ export default function ResizableText({
       <div
         style={{
           fontSize: `${style.fontSize}px`,
+          fontFamily: style.fontFamily,
+          fontWeight: style.fontWeight,
           color: style.color,
           opacity: style.opacity,
-          fontWeight: 'bold',
+          textShadow: style.shadow?.enabled
+            ? `${style.shadow.offsetX}px ${style.shadow.offsetY}px ${style.shadow.blur}px ${style.shadow.color}`
+            : 'none',
+          WebkitTextStroke: style.stroke?.enabled
+            ? `${style.stroke.width}px ${style.stroke.color}`
+            : 'none',
           letterSpacing: '0.1em',
           whiteSpace: 'nowrap',
         }}
       >
         {text}
       </div>
-      <div
-        className="absolute -bottom-2 -right-2 w-4 h-4 bg-blue-500 rounded-full opacity-0 group-hover:opacity-75 cursor-se-resize"
-        onMouseDown={handleResizeStart}
-      />
+      {isSelected && (
+        <div
+          className="absolute -bottom-2 -right-2 w-4 h-4 bg-blue-500 rounded-full opacity-75 cursor-se-resize"
+          onMouseDown={handleResizeStart}
+        />
+      )}
     </div>
   );
 }
