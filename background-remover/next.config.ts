@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ['api.remove.bg'],
+    domains: ['api.remove.bg', 'api.hyperbolic.xyz'],
   },
 };
 

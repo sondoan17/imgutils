@@ -139,7 +139,7 @@ export default function TextBehind() {
       ctx.letterSpacing = '0.1em';
       
       
-      // Reset shadow and global alpha for each layer
+      // Reset shadow and global alpha for each layer 
       ctx.shadowColor = 'transparent';
       ctx.shadowBlur = 0;
       ctx.shadowOffsetX = 0;
