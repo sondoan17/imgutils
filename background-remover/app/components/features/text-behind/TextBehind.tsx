@@ -15,7 +15,6 @@ interface TextLayer {
   style: TextStyle;
 }
 
-
 export default function TextBehind() {
   const [originalImage, setOriginalImage] = useState<string | null>(null);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
@@ -25,6 +24,8 @@ export default function TextBehind() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [imageSize, setImageSize] = useState<{ width: number; height: number } | null>(null);
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
+  const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
 
   const handleRemoveBackground = async (file: File) => {
     setLoading(true);
@@ -200,6 +201,31 @@ export default function TextBehind() {
     setSelectedLayerId(null);  // Clear selection when removing all text
   };
 
+  const generateTextSuggestions = async () => {
+    if (!originalImage) return;
+    
+    setLoadingSuggestions(true);
+    try {
+      const response = await fetch('/api/generate-text', {
+        method: 'POST',
+      });
+      const data = await response.json();
+      
+      if (data.error) throw new Error(data.error);
+      
+      const suggestions = data.suggestions
+        ?.split('\n')
+        .filter((text: string) => text.trim())
+        .slice(0, 3) || [];
+        
+      setAiSuggestions(suggestions);
+    } catch (error) {
+      console.error('Error generating suggestions:', error);
+    } finally {
+      setLoadingSuggestions(false);
+    }
+  };
+
   useEffect(() => {
     const handleGlobalClick = (e: MouseEvent) => {
       // Check if click is outside of any text layer and text controls
@@ -307,6 +333,33 @@ export default function TextBehind() {
                 className="object-contain pointer-events-none"
               />
             </div>
+          </div>
+
+          <div className="border rounded-lg p-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">AI Text Suggestions</h3>
+              <button
+                onClick={generateTextSuggestions}
+                className="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition-colors"
+                disabled={loadingSuggestions || !originalImage}
+              >
+                {loadingSuggestions ? 'Generating...' : 'Get Suggestions'}
+              </button>
+            </div>
+            
+            {aiSuggestions.length > 0 && (
+              <div className="grid grid-cols-1 gap-2">
+                {aiSuggestions.map((suggestion, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleTextOverlay(suggestion, { x: 50, y: 50 }, defaultTextStyle)}
+                    className="text-left p-2 hover:bg-gray-100 rounded-md transition-colors"
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <TextOverlay 
