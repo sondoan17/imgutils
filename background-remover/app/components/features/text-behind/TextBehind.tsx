@@ -135,6 +135,8 @@ export default function TextBehind() {
       ctx.globalAlpha = layer.style.opacity;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
+      ctx.letterSpacing = '0.1em';
+      
       
       // Reset shadow and global alpha for each layer
       ctx.shadowColor = 'transparent';
