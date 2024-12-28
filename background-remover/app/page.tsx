@@ -9,21 +9,29 @@ export default function Home() {
   const [activeFeature, setActiveFeature] = useState('remove-bg');
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       <Navbar 
         activeFeature={activeFeature} 
         onFeatureChange={setActiveFeature} 
       />
-      <div className="max-w-7xl mx-auto px-4">
-        <h1 className="text-3xl font-bold text-center mb-8">
-          Image Processing Tool
+      <main className="max-w-7xl mx-auto px-4 py-8">
+        <h1 className="text-4xl font-bold text-center mb-2 text-gray-800">
+          AI Image Processing
         </h1>
+        <p className="text-center text-gray-600 mb-8">
+          Remove backgrounds and add text effects with AI
+        </p>
         {activeFeature === 'remove-bg' ? (
           <ImageUploader />
         ) : (
           <TextBehind />
         )}
-      </div>
+      </main>
+      <footer className="mt-16 py-8 bg-white border-t">
+        <div className="max-w-7xl mx-auto px-4 text-center text-gray-600">
+          <p>Powered by sondoan17 • Made with ❤️</p>
+        </div>
+      </footer>
     </div>
   );
 }
