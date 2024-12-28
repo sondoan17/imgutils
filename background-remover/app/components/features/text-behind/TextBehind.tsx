@@ -242,17 +242,32 @@ export default function TextBehind() {
   }, []);
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <div {...getRootProps()} className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400">
-        <input {...getInputProps()} />
-        {isDragActive ? (
-          <p>Drop the image here...</p>
-        ) : (
-          <p>Drag & drop an image here, or click to select one</p>
-        )}
-      </div>
-
-      {originalImage && processedImage && (
+    <div className="max-w-4xl mx-auto">
+      {!processedImage ? (
+        <div
+          {...getRootProps()}
+          className="border-2 border-dashed border-gray-300 rounded-xl p-12 text-center cursor-pointer hover:border-purple-400 transition-colors bg-gray-50"
+        >
+          <input {...getInputProps()} />
+          <div className="space-y-4">
+            <div className="text-gray-500">
+              {isDragActive ? (
+                <p className="text-lg">Drop your image here...</p>
+              ) : (
+                <>
+                  <p className="text-lg mb-2">Drag & drop an image here</p>
+                  <p className="text-sm text-gray-400">
+                    or click to select one
+                  </p>
+                </>
+              )}
+            </div>
+            <p className="text-xs text-gray-400">
+              Supported formats: JPEG, PNG (max 5MB)
+            </p>
+          </div>
+        </div>
+      ) : (
         <div className="mt-8 space-y-8">
           <div className="border rounded-lg p-4">
             <div className="flex justify-between items-center mb-2">
@@ -285,7 +300,7 @@ export default function TextBehind() {
               }}
             >
               <Image 
-                src={originalImage}
+                src={originalImage!}
                 alt="Base"
                 fill
                 className="object-contain"
@@ -381,9 +396,11 @@ export default function TextBehind() {
       )}
 
       {loading && (
-        <div className="mt-4 text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
-          <p className="mt-2">Processing image...</p>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-500 border-t-transparent mx-auto"></div>
+            <p className="mt-4 text-gray-700">Processing image...</p>
+          </div>
         </div>
       )}
     </div>
