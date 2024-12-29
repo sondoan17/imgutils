@@ -13,7 +13,7 @@ export default function Header({ activeFeature = 'remove-bg' }: HeaderProps) {
         <div className="flex justify-between h-16 items-center">
           <div className="flex items-center">
             <Link href="/" className="text-2xl font-bold text-purple-600">
-              ImageAI
+              ImageUtils
             </Link>
           </div>
           <nav className="hidden sm:flex sm:space-x-8">
