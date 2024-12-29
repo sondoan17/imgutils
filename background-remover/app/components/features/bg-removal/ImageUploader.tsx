@@ -33,7 +33,7 @@ const ImageUploader = () => {
   });
   const [isSelected, setIsSelected] = useState(false);
   const [activeHandle, setActiveHandle] = useState<string | null>(null);
-  const [previewDimensions, setPreviewDimensions] = useState({
+  const [, setPreviewDimensions] = useState({
     width: 800,
     height: 800,
   });

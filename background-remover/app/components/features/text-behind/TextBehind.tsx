@@ -2,7 +2,6 @@
 
 import { useCallback, useState, useRef, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
-import axios from 'axios';
 import TextOverlay from '../../shared/text/TextOverlay';
 import ResizableText from '../../shared/text/ResizableText';
 import Image from 'next/image';

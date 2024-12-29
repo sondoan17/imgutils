@@ -1,10 +1,5 @@
 'use client';
 
-interface NavItem {
-  id: string;
-  label: string;
-}
-
 interface NavbarProps {
   activeFeature: string;
   onFeatureChange: (feature: string) => void;
