@@ -19,15 +19,15 @@ export interface TextStyle {
 }
 
 export const defaultTextStyle: TextStyle = {
-  fontSize: 48,
-  color: '#000000',
+  fontSize: 32,
+  fontFamily: 'Roboto Mono',
+  color: '#ffffff',
   opacity: 1,
-  fontFamily: 'Arial',
   fontWeight: 'normal',
   shadow: {
-    enabled: false,
-    color: '#000000',
-    blur: 4,
+    enabled: true,
+    color: 'rgba(0, 0, 0, 0.5)',
+    blur: 5,
     offsetX: 2,
     offsetY: 2
   },
