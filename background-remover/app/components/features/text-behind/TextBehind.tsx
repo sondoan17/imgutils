@@ -195,23 +195,70 @@ export default function TextBehind() {
     
     setLoadingSuggestions(true);
     try {
+      // Convert blob URL to base64
+      const base64Image = await blobUrlToBase64(originalImage);
+      
       const response = await fetch('/api/generate-text', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          imageUrl: base64Image
+        }),
       });
+      
       const data = await response.json();
       
-      if (data.error) throw new Error(data.error);
+      if (data.error) {
+        console.error('API Error:', data.error, data.details);
+        throw new Error(data.error);
+      }
+      
+      if (!data.suggestions) {
+        throw new Error('No suggestions received from API');
+      }
       
       const suggestions = data.suggestions
-        ?.split('\n')
+        .split('\n')
         .filter((text: string) => text.trim())
-        .slice(0, 3) || [];
+        .map((text: string) => text.replace(/^\d+\.\s*/, ''))
+        .slice(0, 3);
+        
+      if (suggestions.length === 0) {
+        throw new Error('No valid suggestions found');
+      }
         
       setAiSuggestions(suggestions);
     } catch (error) {
       console.error('Error generating suggestions:', error);
+      setAiSuggestions(['Failed to generate suggestions']);
     } finally {
       setLoadingSuggestions(false);
+    }
+  };
+
+  // Helper function to convert blob URL to base64
+  const blobUrlToBase64 = async (blobUrl: string): Promise<string> => {
+    try {
+      const response = await fetch(blobUrl);
+      const blob = await response.blob();
+      
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (typeof reader.result === 'string') {
+            resolve(reader.result);
+          } else {
+            reject(new Error('Failed to convert to base64'));
+          }
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error('Error converting blob to base64:', error);
+      throw error;
     }
   };
 
@@ -265,7 +312,7 @@ export default function TextBehind() {
         <div className="mt-8 space-y-8">
           <div className="border rounded-lg p-4">
             <div className="flex justify-between items-center mb-2">
-              <h3 className="text-lg font-semibold">Preview</h3>
+              <h3 className="text-lg font-semibold text-gray-700">Preview</h3>
               <div className="flex gap-2">
                 {selectedLayerId && (
                   <button
@@ -346,7 +393,7 @@ export default function TextBehind() {
 
           <div className="border rounded-lg p-4">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">AI Text Suggestions</h3>
+              <h3 className="text-lg font-semibold text-gray-700">AI Text Suggestions</h3>
               <button
                 onClick={generateTextSuggestions}
                 className="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition-colors"
@@ -362,7 +409,7 @@ export default function TextBehind() {
                   <button
                     key={index}
                     onClick={() => handleTextOverlay(suggestion, { x: 50, y: 50 }, defaultTextStyle)}
-                    className="text-left p-2 hover:bg-gray-100 rounded-md transition-colors"
+                    className="text-left p-2 hover:bg-gray-100 rounded-md text-gray-700 transition-colors"
                   >
                     {suggestion}
                   </button>
