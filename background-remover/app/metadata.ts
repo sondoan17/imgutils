@@ -1,4 +1,7 @@
-export const defaultMetadata = {
+import { Metadata } from 'next/types';
+
+export const defaultMetadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'https://imgutils.vercel.app'),
   title: 'AI Image Processing Tools',
   description: 'Transform your images with powerful AI tools. Remove backgrounds, create text-behind effects, and more.',
   keywords: 'AI image processing, background removal, text effects, image editing',
