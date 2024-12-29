@@ -7,6 +7,7 @@ import TextOverlay from '../../shared/text/TextOverlay';
 import ResizableText from '../../shared/text/ResizableText';
 import Image from 'next/image';
 import { TextStyle, defaultTextStyle } from '@/app/types/text';
+import { removeBackground } from '@imgly/background-removal';
 
 interface TextLayer {
   id: string;
@@ -29,21 +30,10 @@ export default function TextBehind() {
 
   const handleRemoveBackground = async (file: File) => {
     setLoading(true);
-    const formData = new FormData();
-    formData.append('image_file', file);
-
     try {
-      const response = await axios({
-        method: 'post',
-        url: 'https://api.remove.bg/v1.0/removebg',
-        data: formData,
-        responseType: 'arraybuffer',
-        headers: {
-          'X-Api-Key': process.env.NEXT_PUBLIC_REMOVEBG_API_KEY,
-        },
+      const blob = await removeBackground(file, {
+        model: 'medium',
       });
-
-      const blob = new Blob([response.data], { type: 'image/png' });
       const url = URL.createObjectURL(blob);
       setProcessedImage(url);
     } catch (error) {
@@ -242,27 +232,32 @@ export default function TextBehind() {
   }, []);
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-8xl mx-auto">
       {!processedImage ? (
         <div
           {...getRootProps()}
-          className="border-2 border-dashed border-gray-300 rounded-xl p-12 text-center cursor-pointer hover:border-purple-400 transition-colors bg-gray-50"
+          className="border-3 border-dashed border-purple-200 rounded-2xl p-16 text-center cursor-pointer hover:border-purple-400 transition-all duration-300 bg-gradient-to-b from-purple-50 to-white"
         >
           <input {...getInputProps()} />
-          <div className="space-y-4">
-            <div className="text-gray-500">
+          <div className="space-y-6">
+            <div className="w-20 h-20 mx-auto bg-purple-100 rounded-full flex items-center justify-center">
+              <svg className="w-10 h-10 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <div className="text-gray-600">
               {isDragActive ? (
-                <p className="text-lg">Drop your image here...</p>
+                <p className="text-xl font-medium text-purple-600">Drop your image here...</p>
               ) : (
                 <>
-                  <p className="text-lg mb-2">Drag & drop an image here</p>
-                  <p className="text-sm text-gray-400">
-                    or click to select one
+                  <p className="text-xl font-medium mb-2">Drag & drop your image here</p>
+                  <p className="text-gray-500">
+                    or click to browse your files
                   </p>
                 </>
               )}
             </div>
-            <p className="text-xs text-gray-400">
+            <p className="text-sm text-gray-400">
               Supported formats: JPEG, PNG (max 5MB)
             </p>
           </div>
@@ -397,9 +392,12 @@ export default function TextBehind() {
 
       {loading && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-xl text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-500 border-t-transparent mx-auto"></div>
-            <p className="mt-4 text-gray-700">Processing image...</p>
+          <div className="bg-white p-8 rounded-2xl shadow-xl text-center max-w-sm w-full mx-4">
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-16 h-16 border-4 border-purple-100 border-t-purple-600 rounded-full animate-spin" />
+              <p className="text-lg font-medium text-gray-700">Processing image...</p>
+              <p className="text-sm text-gray-500">This may take a few moments</p>
+            </div>
           </div>
         </div>
       )}

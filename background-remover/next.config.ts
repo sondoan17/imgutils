@@ -1,8 +1,24 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  webpack: (config) => {
+    // Add WASM file support
+    config.experiments = {
+      ...config.experiments,
+      asyncWebAssembly: true,
+    };
+
+    // Add rule for ONNX models
+    config.module.rules.push({
+      test: /\.onnx$/,
+      type: "asset/resource",
+    });
+
+    return config;
+  },
+  // Disable image optimization for processed images
   images: {
-    domains: ['api.remove.bg', 'api.hyperbolic.xyz'],
+    unoptimized: true,
   },
 };
 
