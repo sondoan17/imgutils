@@ -20,6 +20,12 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
+  poweredByHeader: false,
+  compress: true,
+  i18n: {
+    locales: ['en'],
+    defaultLocale: 'en',
+  }
 };
 
 export default nextConfig;
