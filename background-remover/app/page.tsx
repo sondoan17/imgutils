@@ -3,13 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import Header from "./components/shared/layout/Header";
+import Footer from "./components/shared/layout/Footer";
 import { useState, useEffect } from "react";
-import { Roboto_Mono } from 'next/font/google';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Roboto_Mono } from "next/font/google";
+import { motion } from "framer-motion";
 
 const robotoMono = Roboto_Mono({
-  subsets: ['latin'],
-  display: 'swap',
+  subsets: ["latin"],
+  display: "swap",
 });
 
 export default function Home() {
@@ -17,21 +18,21 @@ export default function Home() {
     [key: string]: boolean;
   }>({});
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [direction, setDirection] = useState(1); // 1 for forward, -1 for backward
-  
+  const [isHovered, setIsHovered] = useState(false);
+
   // Array of demo images
   const demoImages = [
     "https://res-console.cloudinary.com/db2tvcbza/media_explorer_thumbnails/aefe105e7271d1e333b376be6c17a987/detailed",
-    "https://res-console.cloudinary.com/db2tvcbza/media_explorer_thumbnails/65125f06de59b396110d9a0b968dcfb6/detailed",  // Replace with your image URLs
+    "https://res-console.cloudinary.com/db2tvcbza/media_explorer_thumbnails/65125f06de59b396110d9a0b968dcfb6/detailed", // Replace with your image URLs
     "https://res-console.cloudinary.com/db2tvcbza/media_explorer_thumbnails/95ea4ae87ecdb1b9ebe83a1f0ac92063/detailed",
-    "https://res-console.cloudinary.com/db2tvcbza/media_explorer_thumbnails/68827228cff1040efa3e071cde7dc020/detailed"
+    "https://res-console.cloudinary.com/db2tvcbza/media_explorer_thumbnails/68827228cff1040efa3e071cde7dc020/detailed",
   ];
 
   const layerVariants = {
     layer4: { rotate: 9, scale: 0.9, zIndex: 1 },
     layer3: { rotate: 6, scale: 0.95, zIndex: 2 },
     layer2: { rotate: 3, scale: 1, zIndex: 3 },
-    layer1: { rotate: -3, scale: 1.05, zIndex: 4 }
+    layer1: { rotate: -3, scale: 1.05, zIndex: 4 },
   };
 
   useEffect(() => {
@@ -138,7 +139,9 @@ export default function Home() {
   ];
 
   return (
-    <div className={`min-h-screen bg-gradient-to-b from-purple-50 to-white ${robotoMono.className}`}>
+    <div
+      className={`min-h-screen bg-gradient-to-b from-purple-50 to-white ${robotoMono.className}`}
+    >
       <Header />
 
       {/* Hero Section */}
@@ -198,26 +201,40 @@ export default function Home() {
             <div className="relative w-full aspect-square group">
               {demoImages.map((image, index) => {
                 const position = (index - currentImageIndex + 4) % 4;
-                const layerName = `layer${position + 1}` as keyof typeof layerVariants;
-                
+                const layerName = `layer${
+                  position + 1
+                }` as keyof typeof layerVariants;
+                const isTopLayer = position === 0;
+
                 return (
                   <motion.div
                     key={index}
                     className="absolute inset-0"
                     initial={layerVariants[layerName]}
-                    animate={layerVariants[layerName]}
+                    animate={{
+                      ...layerVariants[layerName],
+                      scale:
+                        isTopLayer && isHovered
+                          ? 1.1
+                          : layerVariants[layerName].scale,
+                      rotate:
+                        isTopLayer && isHovered
+                          ? -6
+                          : layerVariants[layerName].rotate,
+                    }}
                     transition={{
                       type: "spring",
                       stiffness: 300,
                       damping: 30,
-                      mass: 1
+                      mass: 1,
                     }}
-                    style={{ 
+                    style={{
                       zIndex: layerVariants[layerName].zIndex,
-                      cursor: position === 0 ? 'pointer' : 'default'
+                      cursor: isTopLayer ? "pointer" : "default",
                     }}
-                    onClick={position === 0 ? handleImageClick : undefined}
-                    whileHover={position === 0 ? { scale: 1.1, rotate: -6 } : undefined}
+                    onClick={isTopLayer ? handleImageClick : undefined}
+                    onHoverStart={() => isTopLayer && setIsHovered(true)}
+                    onHoverEnd={() => isTopLayer && setIsHovered(false)}
                   >
                     <Image
                       src={image}
@@ -238,7 +255,8 @@ export default function Home() {
                     initial={{ scale: 1 }}
                     animate={{
                       scale: index === currentImageIndex ? 1.25 : 1,
-                      backgroundColor: index === currentImageIndex ? '#9333EA' : '#D1D5DB'
+                      backgroundColor:
+                        index === currentImageIndex ? "#9333EA" : "#D1D5DB",
                     }}
                     transition={{ duration: 0.3 }}
                     className="w-2 h-2 rounded-full"
@@ -342,8 +360,6 @@ export default function Home() {
           </div>
         </div>
 
-       
-
         {/* FAQ Section */}
         <div className="mb-20">
           <h2 className="text-3xl font-bold text-gray-800 text-center mb-12">
@@ -400,6 +416,7 @@ export default function Home() {
           ))}
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

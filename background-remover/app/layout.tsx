@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 import { siteConfig } from './metadata.config';
 import './globals.css';
-import Footer from './components/shared/layout/Footer';
 import { Roboto_Mono } from 'next/font/google';
+import { Analytics } from "@vercel/analytics/react"
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -66,8 +66,8 @@ export default function RootLayout({
       <body className={`min-h-screen bg-gray-50 ${robotoMono.className}`}>
         <div className="flex flex-col min-h-screen">
           {children}
-          <Footer />
         </div>
+        <Analytics />
       </body>
     </html>
   );
