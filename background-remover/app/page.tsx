@@ -3,8 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import Header from "./components/shared/layout/Header";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Roboto_Mono } from 'next/font/google';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const robotoMono = Roboto_Mono({
   subsets: ['latin'],
@@ -15,6 +16,35 @@ export default function Home() {
   const [openQuestions, setOpenQuestions] = useState<{
     [key: string]: boolean;
   }>({});
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [direction, setDirection] = useState(1); // 1 for forward, -1 for backward
+  
+  // Array of demo images
+  const demoImages = [
+    "https://res-console.cloudinary.com/db2tvcbza/media_explorer_thumbnails/aefe105e7271d1e333b376be6c17a987/detailed",
+    "https://res-console.cloudinary.com/db2tvcbza/media_explorer_thumbnails/65125f06de59b396110d9a0b968dcfb6/detailed",  // Replace with your image URLs
+    "https://res-console.cloudinary.com/db2tvcbza/media_explorer_thumbnails/95ea4ae87ecdb1b9ebe83a1f0ac92063/detailed",
+    "https://res-console.cloudinary.com/db2tvcbza/media_explorer_thumbnails/68827228cff1040efa3e071cde7dc020/detailed"
+  ];
+
+  const layerVariants = {
+    layer4: { rotate: 9, scale: 0.9, zIndex: 1 },
+    layer3: { rotate: 6, scale: 0.95, zIndex: 2 },
+    layer2: { rotate: 3, scale: 1, zIndex: 3 },
+    layer1: { rotate: -3, scale: 1.05, zIndex: 4 }
+  };
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % demoImages.length);
+    }, 5000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleImageClick = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % demoImages.length);
+  };
 
   const toggleQuestion = (id: string) => {
     setOpenQuestions((prev) => ({
@@ -162,16 +192,59 @@ export default function Home() {
               </p>
             </div>
           </div>
+
+          {/* Stacked Images with Layer Transitions */}
           <div className="flex-1 relative">
-            <div className="relative w-full aspect-square">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-200 to-pink-200 rounded-2xl transform rotate-6"></div>
-              <Image
-                src="https://res-console.cloudinary.com/db2tvcbza/media_explorer_thumbnails/aefe105e7271d1e333b376be6c17a987/detailed"
-                alt="Image Processing Demo"
-                fill
-                className="object-cover rounded-2xl shadow-xl transform -rotate-3 transition-transform hover:rotate-0"
-                priority
-              />
+            <div className="relative w-full aspect-square group">
+              {demoImages.map((image, index) => {
+                const position = (index - currentImageIndex + 4) % 4;
+                const layerName = `layer${position + 1}` as keyof typeof layerVariants;
+                
+                return (
+                  <motion.div
+                    key={index}
+                    className="absolute inset-0"
+                    initial={layerVariants[layerName]}
+                    animate={layerVariants[layerName]}
+                    transition={{
+                      type: "spring",
+                      stiffness: 300,
+                      damping: 30,
+                      mass: 1
+                    }}
+                    style={{ 
+                      zIndex: layerVariants[layerName].zIndex,
+                      cursor: position === 0 ? 'pointer' : 'default'
+                    }}
+                    onClick={position === 0 ? handleImageClick : undefined}
+                    whileHover={position === 0 ? { scale: 1.1, rotate: -6 } : undefined}
+                  >
+                    <Image
+                      src={image}
+                      alt={`Image Processing Demo ${index + 1}`}
+                      fill
+                      className="object-cover rounded-2xl shadow-xl"
+                      priority
+                    />
+                  </motion.div>
+                );
+              })}
+
+              {/* Image indicators */}
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
+                {demoImages.map((_, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ scale: 1 }}
+                    animate={{
+                      scale: index === currentImageIndex ? 1.25 : 1,
+                      backgroundColor: index === currentImageIndex ? '#9333EA' : '#D1D5DB'
+                    }}
+                    transition={{ duration: 0.3 }}
+                    className="w-2 h-2 rounded-full"
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>
