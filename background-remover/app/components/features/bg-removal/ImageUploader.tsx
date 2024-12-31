@@ -321,12 +321,14 @@ const ImageUploader = () => {
                   className="object-contain rounded-lg"
                 />
               </div>
-              <button
-                onClick={handleDownload}
-                className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-              >
-                Download PNG
-              </button>
+              <div className="flex justify-center">
+                <button
+                  onClick={handleDownload}
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                >
+                  Download PNG
+                </button>
+              </div>
             </div>
           </div>
 
@@ -502,12 +504,15 @@ const ImageUploader = () => {
                     </div>
                   )}
                 </div>
-                <button
-                  onClick={handleDownloadWithBackground}
-                  className="w-full max-w-[800px] mx-auto px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                >
-                  Download with Background
-                </button>
+                <div className="flex justify-center gap-4">
+                  
+                  <button
+                    onClick={handleDownloadWithBackground}
+                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                  >
+                    Download with Background
+                  </button>
+                </div>
               </div>
             )}
           </div>
