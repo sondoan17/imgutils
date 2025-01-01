@@ -22,10 +22,10 @@ export default function Home() {
 
   // Array of demo images
   const demoImages = [
-    "https://res-console.cloudinary.com/db2tvcbza/media_explorer_thumbnails/aefe105e7271d1e333b376be6c17a987/detailed",
-    "https://res-console.cloudinary.com/db2tvcbza/media_explorer_thumbnails/65125f06de59b396110d9a0b968dcfb6/detailed", // Replace with your image URLs
-    "https://res-console.cloudinary.com/db2tvcbza/media_explorer_thumbnails/95ea4ae87ecdb1b9ebe83a1f0ac92063/detailed",
-    "https://res-console.cloudinary.com/db2tvcbza/media_explorer_thumbnails/68827228cff1040efa3e071cde7dc020/detailed",
+    "https://res.cloudinary.com/db2tvcbza/image/upload/v1735507403/cng1igldnopmgjjle3tp.png",
+    "https://res.cloudinary.com/db2tvcbza/image/upload/v1735587306/rlyssrm9xio338omn0ix.png", // Replace with your image URLs
+    "https://res.cloudinary.com/db2tvcbza/image/upload/v1735587629/gm053cw6qyecsszgonio.png",
+    "https://res.cloudinary.com/db2tvcbza/image/upload/v1735588436/pummrglcechhswe8i7jh.png",
   ];
 
   const layerVariants = {
