@@ -86,3 +86,4 @@ For support, please [open an issue](https://github.com/sondoan17/imgutils/issues
 ## Credits
 
 Developed with ❤️ by [sondoan17](https://github.com/sondoan17)
+
