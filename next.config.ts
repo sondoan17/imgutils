@@ -23,9 +23,9 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
   i18n: {
-    locales: ['en'],
-    defaultLocale: 'en',
-  }
+    locales: ["en"],
+    defaultLocale: "en",
+  },
 };
 
 export default nextConfig;
