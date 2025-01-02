@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Header from "./components/shared/layout/Header";
 import Footer from "./components/shared/layout/Footer";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Roboto_Mono } from "next/font/google";
 import { motion } from "framer-motion";
 
@@ -21,12 +21,12 @@ export default function Home() {
   const [isHovered, setIsHovered] = useState(false);
 
   // Array of demo images
-  const demoImages = [
+  const demoImages = useMemo(() => [
     "https://res.cloudinary.com/db2tvcbza/image/upload/v1735507403/cng1igldnopmgjjle3tp.png",
-    "https://res.cloudinary.com/db2tvcbza/image/upload/v1735587306/rlyssrm9xio338omn0ix.png", // Replace with your image URLs
+    "https://res.cloudinary.com/db2tvcbza/image/upload/v1735587306/rlyssrm9xio338omn0ix.png", 
     "https://res.cloudinary.com/db2tvcbza/image/upload/v1735587629/gm053cw6qyecsszgonio.png",
     "https://res.cloudinary.com/db2tvcbza/image/upload/v1735588436/pummrglcechhswe8i7jh.png",
-  ];
+  ], []);
 
   const layerVariants = {
     layer4: { rotate: 9, scale: 0.9, zIndex: 1 },
@@ -36,12 +36,12 @@ export default function Home() {
   };
 
   useEffect(() => {
-    const timer = setInterval(() => {
+    const interval = setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % demoImages.length);
     }, 5000);
 
-    return () => clearInterval(timer);
-  }, []);
+    return () => clearInterval(interval);
+  }, [demoImages.length]);
 
   const handleImageClick = () => {
     setCurrentImageIndex((prev) => (prev + 1) % demoImages.length);

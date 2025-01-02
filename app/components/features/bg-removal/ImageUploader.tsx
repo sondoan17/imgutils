@@ -68,22 +68,7 @@ const ImageUploader = () => {
     return () => document.removeEventListener("click", handleGlobalClick);
   }, []);
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    const file = acceptedFiles[0];
-    setOriginalImage(URL.createObjectURL(file));
-    handleRemoveBackground(file);
-  }, []);
-
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    accept: {
-      "image/*": [".jpeg", ".jpg", ".png"],
-    },
-    multiple: false,
-    maxSize: 5242880, // 5MB
-  });
-
-  const handleRemoveBackground = async (file: File) => {
+  const handleRemoveBackground = useCallback(async (file: File) => {
     setLoading(true);
     try {
       let url;
@@ -111,7 +96,23 @@ const ImageUploader = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isMobile]);
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    const file = acceptedFiles[0];
+    if (file) {
+      handleRemoveBackground(file);
+    }
+  }, [handleRemoveBackground]);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      "image/*": [".jpeg", ".jpg", ".png"],
+    },
+    multiple: false,
+    maxSize: 5242880, // 5MB
+  });
 
   const handleDownload = () => {
     if (processedImage) {

@@ -41,7 +41,7 @@ export default function TextBehind() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const handleRemoveBackground = async (file: File) => {
+  const handleRemoveBackground = useCallback(async (file: File) => {
     setLoading(true);
     try {
       let url;
@@ -69,20 +69,21 @@ export default function TextBehind() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isMobile]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
-    // Clear previous states
+    setOriginalImage(null);
     setProcessedImage(null);
     setTextLayers([]);
     setImageSize(null);
     
-    // Set new image
     const file = acceptedFiles[0];
-    const originalUrl = URL.createObjectURL(file);
-    setOriginalImage(originalUrl);
-    handleRemoveBackground(file);
-  }, []);
+    if (file) {
+      const originalUrl = URL.createObjectURL(file);
+      setOriginalImage(originalUrl);
+      handleRemoveBackground(file);
+    }
+  }, [handleRemoveBackground]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
