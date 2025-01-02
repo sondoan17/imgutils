@@ -5,6 +5,7 @@ import { useDropzone } from "react-dropzone";
 import axios from "axios";
 import Image from "next/image";
 import { removeBackground } from '@imgly/background-removal';
+import { isMobileDevice } from '@/app/utils/deviceDetection';
 
 const convertBase64ToUrl = (base64String: string) => {
   return `data:image/png;base64,${base64String}`;
@@ -38,6 +39,19 @@ const ImageUploader = () => {
     height: 800,
   });
   const [imageSize, setImageSize] = useState<{ width: number; height: number } | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(isMobileDevice());
+    
+    // Add resize listener for responsive updates
+    const handleResize = () => {
+      setIsMobile(isMobileDevice());
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const handleGlobalClick = (e: MouseEvent) => {
@@ -72,10 +86,25 @@ const ImageUploader = () => {
   const handleRemoveBackground = async (file: File) => {
     setLoading(true);
     try {
-      const blob = await removeBackground(file, {
-        model: 'medium',
-      });
-      const url = URL.createObjectURL(blob);
+      let url;
+      
+      if (isMobile) {
+        const formData = new FormData();
+        formData.append('image_file', file);
+        
+        const response = await axios.post('/api/remove-bg', formData, {
+          responseType: 'arraybuffer'
+        });
+        
+        const blob = new Blob([response.data], { type: 'image/png' });
+        url = URL.createObjectURL(blob);
+      } else {
+        const blob = await removeBackground(file, {
+          model: 'medium',
+        });
+        url = URL.createObjectURL(blob);
+      }
+      
       setProcessedImage(url);
     } catch (error) {
       console.error('Error removing background:', error);
@@ -364,10 +393,10 @@ const ImageUploader = () => {
                 <div
                   className="relative overflow-hidden mx-auto rounded-lg shadow-md"
                   style={{ 
-                    width: '100%', 
-                    maxWidth: '800px',
+                    width: '100%',
+                    maxWidth: isMobile ? '100%' : '800px',
                     aspectRatio: imageSize ? `${imageSize.width}/${imageSize.height}` : '1/1',
-                    minWidth: '600px'
+                    minWidth: isMobile ? 'auto' : '600px'
                   }}
                   onMouseMove={handleMouseMove}
                   onMouseUp={handleMouseUp}

@@ -7,6 +7,8 @@ import ResizableText from '../../shared/text/ResizableText';
 import Image from 'next/image';
 import { TextStyle, defaultTextStyle } from '@/app/types/text';
 import { removeBackground } from '@imgly/background-removal';
+import { isMobileDevice } from '@/app/utils/deviceDetection';
+import axios from 'axios';
 
 interface TextLayer {
   id: string;
@@ -26,14 +28,41 @@ export default function TextBehind() {
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
   const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(isMobileDevice());
+    
+    const handleResize = () => {
+      setIsMobile(isMobileDevice());
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleRemoveBackground = async (file: File) => {
     setLoading(true);
     try {
-      const blob = await removeBackground(file, {
-        model: 'medium',
-      });
-      const url = URL.createObjectURL(blob);
+      let url;
+      
+      if (isMobile) {
+        const formData = new FormData();
+        formData.append('image_file', file);
+        
+        const response = await axios.post('/api/remove-bg', formData, {
+          responseType: 'arraybuffer'
+        });
+        
+        const blob = new Blob([response.data], { type: 'image/png' });
+        url = URL.createObjectURL(blob);
+      } else {
+        const blob = await removeBackground(file, {
+          model: 'medium',
+        });
+        url = URL.createObjectURL(blob);
+      }
+      
       setProcessedImage(url);
     } catch (error) {
       console.error('Error removing background:', error);
