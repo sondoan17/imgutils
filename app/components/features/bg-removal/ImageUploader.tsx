@@ -6,6 +6,7 @@ import axios from "axios";
 import Image from "next/image";
 import { removeBackground } from '@imgly/background-removal';
 import { isMobileDevice } from '@/app/utils/deviceDetection';
+import { ImageFormat } from '@/app/types/image';
 
 const convertBase64ToUrl = (base64String: string) => {
   return `data:image/png;base64,${base64String}`;
@@ -40,6 +41,8 @@ const ImageUploader = () => {
   });
   const [imageSize, setImageSize] = useState<{ width: number; height: number } | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [processedFormat, setProcessedFormat] = useState<ImageFormat>('png');
+  const [compositeFormat, setCompositeFormat] = useState<ImageFormat>('png');
 
   useEffect(() => {
     setIsMobile(isMobileDevice());
@@ -148,7 +151,7 @@ const ImageUploader = () => {
     }
   };
 
-  const handleDownloadWithBackground = async () => {
+  const handleDownloadWithBackground = async (format: ImageFormat) => {
     if (!processedImage || !generatedBackground || !imageSize) return;
 
     const canvas = document.createElement('canvas');
@@ -166,10 +169,6 @@ const ImageUploader = () => {
     if (!containerElement) return;
     const containerRect = containerElement.getBoundingClientRect();
 
-    // Calculate scale factors based on actual image dimensions
-    const scaleX = bgImage.naturalWidth / containerRect.width;
-    const scaleY = bgImage.naturalHeight / containerRect.height;
-
     // Calculate scaled position and size
     const scaledX = (position.x / containerRect.width) * bgImage.naturalWidth;
     const scaledY = (position.y / containerRect.height) * bgImage.naturalHeight;
@@ -178,18 +177,16 @@ const ImageUploader = () => {
 
     // Draw processed image
     const processedImg = await loadImage(processedImage);
-    ctx.drawImage(
-      processedImg,
-      scaledX,
-      scaledY,
-      scaledWidth,
-      scaledHeight
-    );
+    ctx.drawImage(processedImg, scaledX, scaledY, scaledWidth, scaledHeight);
+
+    // Configure format and quality
+    const mimeType = `image/${format}`;
+    const quality = format === 'png' ? 1 : 0.9;
 
     // Create download link
     const link = document.createElement('a');
-    link.download = 'image-with-background.png';
-    link.href = canvas.toDataURL('image/png', 1.0);
+    link.download = `image-with-background.${format}`;
+    link.href = canvas.toDataURL(mimeType, quality);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -339,6 +336,37 @@ const ImageUploader = () => {
     }
   }, [generatedBackground]);
 
+  const handleExport = async (format: ImageFormat) => {
+    if (!processedImage) return;
+    
+    const canvas = document.createElement('canvas');
+    const img = await loadImage(processedImage);
+    
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    // Draw the image
+    ctx.drawImage(img, 0, 0);
+    
+    // Configure format and quality
+    const mimeType = `image/${format}`;
+    const quality = format === 'png' ? 1 : 0.9;
+    
+    // Convert to desired format
+    const dataUrl = canvas.toDataURL(mimeType, quality);
+    
+    // Create download link
+    const link = document.createElement('a');
+    link.href = dataUrl;
+    link.download = `processed-image.${format}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="max-w-8xl mx-auto">
       {!processedImage ? (
@@ -403,13 +431,27 @@ const ImageUploader = () => {
                   className="object-contain rounded-lg"
                 />
               </div>
-              <div className="flex justify-center">
-                <button
-                  onClick={handleDownload}
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-                >
-                  Download PNG
-                </button>
+              <div className="space-y-4">
+                {/* Processed Image Download */}
+                <div className="flex justify-center gap-4">
+                  <select
+                    value={processedFormat}
+                    onChange={(e) => setProcessedFormat(e.target.value as ImageFormat)}
+                    className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  >
+                    <option value="png">PNG</option>
+                    <option value="jpeg">JPEG</option>
+                    <option value="webp">WebP</option>
+                  </select>
+                  <button
+                    onClick={() => handleExport(processedFormat)}
+                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                  >
+                    Download Processed {processedFormat.toUpperCase()}
+                  </button>
+                </div>
+
+              
               </div>
             </div>
           </div>
@@ -590,14 +632,22 @@ const ImageUploader = () => {
                   )}
                 </div>
                 <div className="flex justify-center gap-4">
-                  
-                  <button
-                    onClick={handleDownloadWithBackground}
-                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-                  >
-                    Download with Background
-                  </button>
-                </div>
+                    <select
+                      value={compositeFormat}
+                      onChange={(e) => setCompositeFormat(e.target.value as ImageFormat)}
+                      className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    >
+                      <option value="png">PNG</option>
+                      <option value="jpeg">JPEG</option>
+                      <option value="webp">WebP</option>
+                    </select>
+                    <button
+                      onClick={() => handleDownloadWithBackground(compositeFormat)}
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                    >
+                      Download With Background {compositeFormat.toUpperCase()}
+                    </button>
+                  </div>
               </div>
             )}
           </div>
