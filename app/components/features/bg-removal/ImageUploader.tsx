@@ -284,6 +284,35 @@ const ImageUploader = () => {
     setIsResizing(false);
   };
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      e.preventDefault();
+      e.stopPropagation();
+      const touch = e.touches[0];
+      setIsDragging(true);
+      setIsSelected(true);
+      setDragStart({
+        x: touch.clientX - position.x,
+        y: touch.clientY - position.y,
+      });
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (isDragging && e.touches.length === 1) {
+      e.preventDefault();
+      const touch = e.touches[0];
+      setPosition({
+        x: touch.clientX - dragStart.x,
+        y: touch.clientY - dragStart.y,
+      });
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+  };
+
   useEffect(() => {
     if (processedImage) {
       const img = new window.Image();
@@ -456,6 +485,9 @@ const ImageUploader = () => {
                         handleMouseDown(e);
                         setIsSelected(true);
                       }}
+                      onTouchStart={handleTouchStart}
+                      onTouchMove={handleTouchMove}
+                      onTouchEnd={handleTouchEnd}
                       className={`processed-image-container relative ${
                         isSelected ? 'ring-2 ring-purple-500' : ''
                       } transform-gpu`}
