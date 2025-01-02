@@ -61,7 +61,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="favicon.ico" />
       </head>
       <body className={`min-h-screen bg-gray-50 ${robotoMono.className}`}>
         <div className="flex flex-col min-h-screen">
