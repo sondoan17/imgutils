@@ -71,8 +71,17 @@ const ImageUploader = () => {
   const handleRemoveBackground = useCallback(async (file: File) => {
     setLoading(true);
     try {
-      let url;
-      
+      // Read the file as Data URL for original image
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          setOriginalImage(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
+
+      // Process background removal
+      let processedUrl;
       if (isMobile) {
         const formData = new FormData();
         formData.append('image_file', file);
@@ -82,15 +91,25 @@ const ImageUploader = () => {
         });
         
         const blob = new Blob([response.data], { type: 'image/png' });
-        url = URL.createObjectURL(blob);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (typeof reader.result === 'string') {
+            setProcessedImage(reader.result);
+          }
+        };
+        reader.readAsDataURL(blob);
       } else {
         const blob = await removeBackground(file, {
           model: 'medium',
         });
-        url = URL.createObjectURL(blob);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (typeof reader.result === 'string') {
+            setProcessedImage(reader.result);
+          }
+        };
+        reader.readAsDataURL(blob);
       }
-      
-      setProcessedImage(url);
     } catch (error) {
       console.error('Error removing background:', error);
     } finally {
@@ -99,6 +118,10 @@ const ImageUploader = () => {
   }, [isMobile]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
+    // Clear previous states
+    setOriginalImage(null);
+    setProcessedImage(null);
+    
     const file = acceptedFiles[0];
     if (file) {
       handleRemoveBackground(file);

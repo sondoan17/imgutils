@@ -44,8 +44,17 @@ export default function TextBehind() {
   const handleRemoveBackground = useCallback(async (file: File) => {
     setLoading(true);
     try {
-      let url;
-      
+      // Read the file as Data URL for original image
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          setOriginalImage(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
+
+      // Process background removal
+      let processedUrl;
       if (isMobile) {
         const formData = new FormData();
         formData.append('image_file', file);
@@ -55,15 +64,25 @@ export default function TextBehind() {
         });
         
         const blob = new Blob([response.data], { type: 'image/png' });
-        url = URL.createObjectURL(blob);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (typeof reader.result === 'string') {
+            setProcessedImage(reader.result);
+          }
+        };
+        reader.readAsDataURL(blob);
       } else {
         const blob = await removeBackground(file, {
           model: 'medium',
         });
-        url = URL.createObjectURL(blob);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (typeof reader.result === 'string') {
+            setProcessedImage(reader.result);
+          }
+        };
+        reader.readAsDataURL(blob);
       }
-      
-      setProcessedImage(url);
     } catch (error) {
       console.error('Error removing background:', error);
     } finally {
@@ -72,6 +91,7 @@ export default function TextBehind() {
   }, [isMobile]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
+    // Clear previous states
     setOriginalImage(null);
     setProcessedImage(null);
     setTextLayers([]);
@@ -79,8 +99,6 @@ export default function TextBehind() {
     
     const file = acceptedFiles[0];
     if (file) {
-      const originalUrl = URL.createObjectURL(file);
-      setOriginalImage(originalUrl);
       handleRemoveBackground(file);
     }
   }, [handleRemoveBackground]);
@@ -306,6 +324,14 @@ export default function TextBehind() {
     document.addEventListener('click', handleGlobalClick);
     return () => document.removeEventListener('click', handleGlobalClick);
   }, []);
+
+  // Cleanup URLs when component unmounts
+  useEffect(() => {
+    return () => {
+      if (originalImage) URL.revokeObjectURL(originalImage);
+      if (processedImage) URL.revokeObjectURL(processedImage);
+    };
+  }, [originalImage, processedImage]);
 
   return (
     <div className="max-w-8xl mx-auto">
