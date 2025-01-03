@@ -3,6 +3,7 @@ import { siteConfig } from './metadata.config';
 import './globals.css';
 import { Roboto_Mono } from 'next/font/google';
 import { Analytics } from "@vercel/analytics/react"
+import SEOWrapper from './components/shared/SEOWrapper';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -64,9 +65,11 @@ export default function RootLayout({
         <link rel="icon" href="favicon.ico" />
       </head>
       <body className={`min-h-screen bg-gray-50 ${robotoMono.className}`}>
-        <div className="flex flex-col min-h-screen">
-          {children}
-        </div>
+        <SEOWrapper>
+          <div className="flex flex-col min-h-screen">
+            {children}
+          </div>
+        </SEOWrapper>
         <Analytics />
       </body>
     </html>

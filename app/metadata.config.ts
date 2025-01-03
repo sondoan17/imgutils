@@ -1,7 +1,6 @@
 export const siteConfig = {
-  name: "AI Image Tools Online Free",
-  description:
-    "Professional AI-powered image editing tools for background removal and text effects",
+  name: "ImageUtils - Free Online Image Tools",
+  description: "Professional AI-powered image tools for background removal, HEIC conversion, PDF creation, and text effects. Free online image processing tools.",
   url: process.env.NEXT_PUBLIC_BASE_URL || "https://imgutils.xyz",
   ogImage: "/og-image.jpg",
   keywords: [
@@ -38,6 +37,16 @@ export const siteConfig = {
     "AI image background remover online",
     "AI image background remover free",
     "AI image background remover online free",
+    "image to pdf converter",
+    "heic to jpg converter",
+    "heic to png converter",
+    "combine images to pdf",
+    "batch image converter",
+    "free image tools",
+    "online pdf creator",
+    "image format converter",
+    "multiple images to pdf",
+    "image processing online"
   ],
   authors: [
     {

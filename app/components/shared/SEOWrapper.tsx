@@ -1,29 +1,43 @@
-import CanonicalUrl from './CanonicalUrl';
-import WebApplicationStructuredData from '../structured-data/WebApplicationStructuredData';
-import MetaDescription from './MetaDescription';
+"use client";
+import Script from 'next/script';
 
 interface SEOWrapperProps {
-  title: string;
-  description: string;
-  keywords?: string[];
   children: React.ReactNode;
+  title?: string;
+  description?: string;
+  keywords?: string[];
 }
 
-export default function SEOWrapper({
-  title,
-  description,
-  keywords,
-  children,
-}: SEOWrapperProps) {
+export default function SEOWrapper({ children, title, description, keywords }: SEOWrapperProps) {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": title || "ImageUtils",
+    "description": description,
+    "applicationCategory": "Image Processing Tool",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "featureList": [
+      "Background Removal",
+      "HEIC Conversion",
+      "PDF Creation",
+      "Text Effects"
+    ],
+    "keywords": keywords
+  };
+
   return (
     <>
-      <MetaDescription
-        title={title}
-        description={description}
-        keywords={keywords}
+      <Script
+        id="structured-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData)
+        }}
       />
-      <CanonicalUrl />
-      <WebApplicationStructuredData />
       {children}
     </>
   );

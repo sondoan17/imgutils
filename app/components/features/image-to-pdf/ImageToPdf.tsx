@@ -141,8 +141,9 @@ export default function ImageToPdf() {
               <div key={index} className="relative group aspect-video">
                 <Image 
                   src={image.preview || ''} 
-                  alt="preview"
+                  alt={`Preview of image ${index + 1} for PDF conversion`}
                   fill
+                  loading="lazy"
                   className="object-contain rounded-lg"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 />
