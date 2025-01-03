@@ -55,9 +55,9 @@ export default function Header({ activeFeature }: HeaderProps) {
       <nav className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <a href="/" className="text-xl font-bold text-purple-600">
+          <Link href="/" className="text-xl font-bold text-purple-600">
             ImageTools
-          </a>
+          </Link>
 
           {/* Right side navigation */}
           <div className="flex items-center">
