@@ -14,26 +14,35 @@ export default function ImageToPdf() {
   const [pageSize, setPageSize] = useState<string>('a4');
   const [orientation, setOrientation] = useState<'portrait' | 'landscape'>('portrait');
 
-  // Create preview URLs after component mounts
-  useEffect(() => {
-    // Create preview URLs
-    const newImages = images.map(file => ({
-      ...file,
-      preview: file.preview || URL.createObjectURL(file)
+  // Handle file drop
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    const newImages = acceptedFiles.map(file => Object.assign(file, {
+      preview: URL.createObjectURL(file)
     }));
-    setImages(newImages);
-    
-    // Cleanup function
+    setImages(prev => [...prev, ...newImages]);
+  }, []);
+
+  // Cleanup previews when component unmounts
+  useEffect(() => {
     return () => {
-      newImages.forEach(file => {
-        if (file.preview) URL.revokeObjectURL(file.preview);
+      images.forEach(image => {
+        if (image.preview) {
+          URL.revokeObjectURL(image.preview);
+        }
       });
     };
-  }, [images]); // Include images in dependencies
-
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    setImages(prev => [...prev, ...acceptedFiles]);
   }, []);
+
+  const removeImage = (index: number) => {
+    setImages(prev => {
+      const newImages = [...prev];
+      if (newImages[index].preview) {
+        URL.revokeObjectURL(newImages[index].preview!);
+      }
+      newImages.splice(index, 1);
+      return newImages;
+    });
+  };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -45,10 +54,6 @@ export default function ImageToPdf() {
     },
     maxSize: 10485760 // 10MB
   });
-
-  const removeImage = (index: number) => {
-    setImages(prev => prev.filter((_, i) => i !== index));
-  };
 
   const handleConvert = async () => {
     if (images.length === 0) return;
@@ -131,21 +136,21 @@ export default function ImageToPdf() {
 
       {images.length > 0 && (
         <div className="space-y-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {images.map((image, index) => (
-              <div key={index} className="relative group">
+              <div key={index} className="relative group aspect-video">
                 <Image 
                   src={image.preview || ''} 
                   alt="preview"
-                  width={100}
-                  height={100}
-                  className="object-contain"
+                  fill
+                  className="object-contain rounded-lg"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 />
                 <button
                   onClick={() => removeImage(index)}
-                  className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
