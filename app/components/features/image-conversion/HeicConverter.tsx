@@ -2,6 +2,7 @@
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import axios from 'axios';
+import Image from 'next/image';
 
 export default function HeicConverter() {
   const [converting, setConverting] = useState(false);
@@ -74,7 +75,13 @@ export default function HeicConverter() {
         </div>
       ) : (
         <div className="space-y-4">
-          <img src={convertedImage} alt="Converted" className="max-w-full rounded-lg shadow-md" />
+          <Image 
+            src={convertedImage} 
+            alt="Converted"
+            width={300}
+            height={300}
+            className="object-contain"
+          />
           <div className="flex justify-center gap-4">
             <select
               value={outputFormat}

@@ -2,6 +2,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { jsPDF } from 'jspdf';
+import Image from 'next/image';
 
 interface ImageFile extends File {
   preview?: string;
@@ -21,11 +22,10 @@ export default function ImageToPdf() {
     }));
     setImages(newImages);
     
-    // Cleanup preview URLs
     return () => images.forEach(file => {
       if (file.preview) URL.revokeObjectURL(file.preview);
     });
-  }, [images.length]); // Only run when number of images changes
+  }, [images.length]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setImages(prev => [...prev, ...acceptedFiles]);
@@ -130,10 +130,12 @@ export default function ImageToPdf() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {images.map((image, index) => (
               <div key={index} className="relative group">
-                <img
-                  src={image.preview}
-                  alt={`Upload ${index + 1}`}
-                  className="w-full h-40 object-cover rounded-lg"
+                <Image 
+                  src={image.preview || ''} 
+                  alt="preview"
+                  width={100}
+                  height={100}
+                  className="object-contain"
                 />
                 <button
                   onClick={() => removeImage(index)}
