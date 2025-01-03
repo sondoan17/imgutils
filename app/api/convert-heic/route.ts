@@ -13,10 +13,10 @@ export async function POST(request: Request) {
     }
 
     const arrayBuffer = await file.arrayBuffer();
-    const uint8Array = new Uint8Array(arrayBuffer);
+    const buffer = Buffer.from(arrayBuffer);
 
     const convertedBuffer = await heicConvert({
-      buffer: uint8Array,
+      buffer,
       format: format.toUpperCase() as "JPEG" | "PNG",
       quality: 1
     });
