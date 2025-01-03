@@ -21,12 +21,15 @@ export default function Home() {
   const [isHovered, setIsHovered] = useState(false);
 
   // Array of demo images
-  const demoImages = useMemo(() => [
-    "https://res.cloudinary.com/db2tvcbza/image/upload/v1735507403/cng1igldnopmgjjle3tp.png",
-    "https://res.cloudinary.com/db2tvcbza/image/upload/v1735587306/rlyssrm9xio338omn0ix.png", 
-    "https://res.cloudinary.com/db2tvcbza/image/upload/v1735587629/gm053cw6qyecsszgonio.png",
-    "https://res.cloudinary.com/db2tvcbza/image/upload/v1735588436/pummrglcechhswe8i7jh.png",
-  ], []);
+  const demoImages = useMemo(
+    () => [
+      "https://res.cloudinary.com/db2tvcbza/image/upload/v1735507403/cng1igldnopmgjjle3tp.png",
+      "https://res.cloudinary.com/db2tvcbza/image/upload/v1735587306/rlyssrm9xio338omn0ix.png",
+      "https://res.cloudinary.com/db2tvcbza/image/upload/v1735587629/gm053cw6qyecsszgonio.png",
+      "https://res.cloudinary.com/db2tvcbza/image/upload/v1735588436/pummrglcechhswe8i7jh.png",
+    ],
+    []
+  );
 
   const layerVariants = {
     layer4: { rotate: 9, scale: 0.9, zIndex: 1 },
@@ -53,7 +56,101 @@ export default function Home() {
       [id]: !prev[id],
     }));
   };
-
+  const features = [
+    {
+      title: "Enhancement",
+      icon: "✨",
+      tools: [
+        {
+          name: "Background Remover",
+          href: "/background-removal",
+          isNew: false,
+          soon: false,
+        },
+        {
+          name: "Text Behind Effect",
+          href: "/text-behind",
+          isNew: true,
+          soon: false,
+        },
+        {
+          name: "Blur/Unblur Tool",
+          href: "/blur-unblur",
+          isNew: false,
+          soon: true,
+        },
+      ],
+    },
+    {
+      title: "Image Conversion",
+      icon: "🔄",
+      tools: [
+        {
+          name: "HEIC Converter",
+          href: "/image-conversion",
+          isNew: true,
+          soon: false,
+        },
+        {
+          name: "Image Format Converter",
+          href: "/format-conversion",
+          isNew: false,
+          soon: true,
+        },
+        {
+          name: "Image to PDF",
+          href: "/image-to-pdf",
+          isNew: true,
+          soon: false,
+        },
+        {
+          name: "SVG to PNG/JPG",
+          href: "/svg-conversion",
+          isNew: false,
+          soon: true,
+        },
+      ],
+    },
+    {
+      title: "Resizing Tools",
+      icon: "📐",
+      tools: [
+        {
+          name: "Grid Cropper",
+          href: "/grid-cropper",
+          isNew: false,
+          soon: true,
+        },
+        {
+          name: "Batch Resizer",
+          href: "/batch-resize",
+          isNew: false,
+          soon: true,
+        },
+        {
+          name: "Crop to Circle",
+          href: "/circle-crop",
+          isNew: false,
+          soon: true,
+        },
+        {
+          name: "Aspect Ratio Calculator",
+          href: "/aspect-ratio",
+          isNew: false,
+          soon: true,
+        },
+      ],
+    },
+    {
+      title: "Optimization",
+      icon: "⚡",
+      tools: [
+        { name: "Image Compressor", href: "/compress", isNew: false, soon: true },
+        { name: "Exif Extractor", href: "/exif", isNew: false, soon: true },
+        { name: "DPI Changer", href: "/dpi", isNew: false, soon: true },
+      ],
+    },
+  ];
   const faqSections = [
     {
       title: "About ImageUtils",
@@ -78,64 +175,6 @@ export default function Home() {
         },
       ],
     },
-    {
-      title: "Background Removal",
-      questions: [
-        {
-          id: "accuracy",
-          question: "How accurate is the background removal?",
-          answer:
-            "Our technology achieves 99% accuracy in detecting and removing backgrounds from images. It works especially well with portraits, product photos, and objects with clear edges.",
-        },
-        {
-          id: "formats",
-          question: "What image formats are supported?",
-          answer:
-            "We support all common image formats including JPG, PNG, and WEBP. The maximum file size is 5MB to ensure quick processing.",
-        },
-        {
-          id: "custom-bg",
-          question: "Can I add custom backgrounds?",
-          answer:
-            "Yes! After removing the background, you can either keep it transparent or generate custom backgrounds using our AI background generator with simple text prompts.",
-        },
-        {
-          id: "processing-time",
-          question: "How long does processing take?",
-          answer:
-            "Processing time may vary based on image size and complexity, but we optimize for speed without sacrificing quality.",
-        },
-      ],
-    },
-    {
-      title: "Text Behind Effect",
-      questions: [
-        {
-          id: "how-works",
-          question: "How does the text behind effect work?",
-          answer:
-            "Our technology analyzes your image to create depth maps, allowing text to appear naturally behind subjects in your photo. You can adjust text position, size, and style for perfect placement.",
-        },
-        {
-          id: "customize",
-          question: "Can I customize the text style?",
-          answer:
-            "Yes! You can customize font size, color, opacity, and add effects like shadows or strokes. We also offer AI-powered text suggestions for creative inspiration.",
-        },
-        {
-          id: "best-images",
-          question: "What types of images work best?",
-          answer:
-            "The effect works best with images that have clear subjects and some depth. Portraits, product photos, and landscape images are ideal for creating stunning text-behind effects.",
-        },
-        {
-          id: "save-edit",
-          question: "Can I save and edit my designs?",
-          answer:
-            "You can download your finished designs in high quality. While we don't currently save projects, we're working on adding project saving and editing features soon.",
-        },
-      ],
-    },
   ];
 
   return (
@@ -146,7 +185,7 @@ export default function Home() {
 
       {/* Hero Section */}
       <main className="max-w-7xl mx-auto px-4 py-12">
-        <div className="flex flex-col lg:flex-row items-center gap-12 mb-20">
+        <div className="flex flex-col lg:flex-row items-center gap-12 mb-24">
           <div className="flex-1 text-center lg:text-left">
             <h1 className="text-5xl lg:text-7xl font-bold text-gray-800 tracking-tight mb-6">
               Transform Your <span className="text-purple-600">Images</span>{" "}
@@ -268,98 +307,54 @@ export default function Home() {
         </div>
 
         {/* Features Section */}
-        <div className="grid md:grid-cols-2 gap-8 mb-20">
-          <div className="bg-white rounded-2xl shadow-xl p-8 transform transition-all hover:scale-105">
-            <div className="w-16 h-16 bg-purple-100 rounded-xl flex items-center justify-center mb-6">
-              <svg
-                className="w-8 h-8 text-purple-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+        <div className="mb-20">
+          <h2 className="text-3xl font-bold text-gray-800 text-center">
+            Features
+          </h2>
+          <div className="max-w-7xl mx-auto py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+            {features.map((category) => (
+              <div
+                key={category.title}
+                className="bg-white rounded-2xl shadow-lg p-6"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"
-                />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              Background Removal
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Remove backgrounds from your images instantly with our advanced
-              technology. Perfect for product photos, portraits, and creative
-              projects.
-            </p>
-            <Link
-              href="/background-removal"
-              className="inline-flex items-center text-purple-600 font-medium hover:text-purple-700"
-            >
-              Try it now
-              <svg
-                className="w-5 h-5 ml-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </Link>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-xl p-8 transform transition-all hover:scale-105">
-            <div className="w-16 h-16 bg-purple-100 rounded-xl flex items-center justify-center mb-6">
-              <svg
-                className="w-8 h-8 text-purple-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h16m-7 6h7"
-                />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              Text Behind Effect
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Create unique depth effects by placing text behind your subjects.
-              Ideal for social media posts, marketing materials, and creative
-              designs.
-            </p>
-            <Link
-              href="/text-behind"
-              className="inline-flex items-center text-purple-600 font-medium hover:text-purple-700"
-            >
-              Try it now
-              <svg
-                className="w-5 h-5 ml-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </Link>
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="text-2xl">{category.icon}</span>
+                  <h2 className="text-xl font-bold text-gray-800">
+                    {category.title}
+                  </h2>
+                </div>
+                <div className="space-y-3">
+                  {category.tools.map((tool) => (
+                    <Link
+                      key={tool.name}
+                      href={tool.href}
+                      className={`flex items-center justify-between p-3 rounded-lg ${
+                        tool.soon
+                          ? "opacity-50 cursor-not-allowed"
+                          : "hover:bg-purple-50"
+                      } transition-colors`}
+                      onClick={
+                        tool.soon ? (e) => e.preventDefault() : undefined
+                      }
+                    >
+                      <span className="text-gray-700">{tool.name}</span>
+                      {tool.isNew && (
+                        <span className="px-2 py-1 bg-purple-100 text-purple-600 text-xs rounded-full">
+                          New
+                        </span>
+                      )}
+                      {tool.soon && (
+                        <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+                          Soon
+                        </span>
+                      )}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-
         {/* FAQ Section */}
         <div className="mb-20">
           <h2 className="text-3xl font-bold text-gray-800 text-center mb-12">
