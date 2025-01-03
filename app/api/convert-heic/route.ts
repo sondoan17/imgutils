@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     
     // Convert HEIC to JPEG/PNG buffer
     const convertedBuffer = await heicConvert({
-      buffer,
+      buffer: buffer as Buffer,  // Type assertion to Buffer
       format: format.toUpperCase() as "JPEG" | "PNG",
       quality: 1
     });
@@ -36,4 +36,4 @@ export async function POST(request: Request) {
     console.error('Conversion error:', error);
     return NextResponse.json({ error: 'Failed to convert image' }, { status: 500 });
   }
-} 
+}
