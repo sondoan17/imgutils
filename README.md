@@ -20,12 +20,29 @@ ImageUtils is a professional-grade image processing platform that offers powerfu
 - Depth-based text placement
 - Multiple text layer support
 
+### 🔄 Image Format Conversion
+
+- Convert HEIC to JPEG/PNG instantly
+- Maintain high image quality
+- Batch processing support
+- Multiple output formats
+- Optimized file compression
+
+### 📄 Image to PDF Conversion
+
+- Combine multiple images into one PDF
+- Customizable page sizes (A4, Letter, Legal)
+- Portrait and landscape orientation
+- Automatic image scaling and centering
+- Professional-quality output
+
 ## Tech Stack
 
 - **Framework**: Next.js 14
 - **Styling**: Tailwind CSS
 - **Animations**: Framer Motion
 - **Image Processing**: imgly
+- **PDF Generation**: jsPDF
 - **Deployment**: Vercel
 
 ## Getting Started
