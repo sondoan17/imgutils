@@ -22,14 +22,14 @@ export default function ImageConversion() {
               <div>
                 <h3 className="text-lg font-medium text-gray-700">What is HEIC?</h3>
                 <p className="text-gray-600">
-                  HEIC (High Efficiency Image Container) is Apple's implementation of the HEIF standard. 
+                  HEIC (High Efficiency Image Container) is Apple&apos;s implementation of the HEIF standard. 
                   It offers superior compression compared to JPEG while maintaining higher image quality.
                 </p>
               </div>
               <div>
                 <h3 className="text-lg font-medium text-gray-700">Why Convert HEIC?</h3>
                 <p className="text-gray-600">
-                  While HEIC offers excellent compression, it's not universally supported. Converting to 
+                  While HEIC offers excellent compression, it&apos;s not universally supported. Converting to 
                   more common formats ensures compatibility across different devices and platforms.
                 </p>
               </div>

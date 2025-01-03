@@ -16,16 +16,20 @@ export default function ImageToPdf() {
 
   // Create preview URLs after component mounts
   useEffect(() => {
+    // Create preview URLs
     const newImages = images.map(file => ({
       ...file,
       preview: file.preview || URL.createObjectURL(file)
     }));
     setImages(newImages);
     
-    return () => images.forEach(file => {
-      if (file.preview) URL.revokeObjectURL(file.preview);
-    });
-  }, [images.length]);
+    // Cleanup function
+    return () => {
+      newImages.forEach(file => {
+        if (file.preview) URL.revokeObjectURL(file.preview);
+      });
+    };
+  }, [images]); // Include images in dependencies
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setImages(prev => [...prev, ...acceptedFiles]);
