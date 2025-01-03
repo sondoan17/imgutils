@@ -1,36 +1,29 @@
 import { NextResponse } from 'next/server';
 import heicConvert from 'heic-convert';
-import sharp from 'sharp';
 
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const format = formData.get('format') as string;
-    
-    if (!file) {
-      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
+
+    if (!file || !format) {
+      return NextResponse.json({ error: 'File and format are required' }, { status: 400 });
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-    
-    // Convert HEIC to JPEG/PNG buffer
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(new Uint8Array(arrayBuffer));
+
     const convertedBuffer = await heicConvert({
-      buffer: buffer as Buffer,  // Type assertion to Buffer
+      buffer: buffer,
       format: format.toUpperCase() as "JPEG" | "PNG",
       quality: 1
     });
 
-    // Optimize the output using sharp
-    const optimizedBuffer = await sharp(convertedBuffer)
-      .resize(2000, 2000, { fit: 'inside', withoutEnlargement: true })
-      .toBuffer();
-
-    return new NextResponse(optimizedBuffer, {
+    return new NextResponse(convertedBuffer, {
       headers: {
-        'Content-Type': `image/${format}`,
-        'Content-Disposition': `attachment; filename="converted.${format}"`,
-      },
+        'Content-Type': `image/${format.toLowerCase()}`
+      }
     });
   } catch (error) {
     console.error('Conversion error:', error);
