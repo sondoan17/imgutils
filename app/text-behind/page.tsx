@@ -1,5 +1,3 @@
-
-
 import Header from '../components/shared/layout/Header';
 import TextBehind from '../components/features/text-behind/TextBehind';
 import SEOWrapper from '../components/shared/SEOWrapper';
@@ -41,6 +39,50 @@ export default function TextBehindPage() {
           </div>
           <div className="bg-white rounded-2xl shadow-lg p-8">
             <TextBehind />
+            <div className="mt-12 prose max-w-none">
+              <h2 className="text-2xl font-semibold text-gray-800 mb-6">About Text Behind Effect</h2>
+              <div className="grid md:grid-cols-2 gap-8">
+                <div>
+                  <h3 className="text-lg font-medium text-gray-700">How It Works</h3>
+                  <p className="text-gray-600">
+                    Our AI technology automatically detects subjects in your image and places text behind them, 
+                    creating a natural depth effect. This creates an illusion of text weaving through your image.
+                  </p>
+                </div>
+                <div>
+                  <h3 className="text-lg font-medium text-gray-700">Best Practices</h3>
+                  <p className="text-gray-600">
+                    Use images with clear subjects and contrasting backgrounds. The effect works best with 
+                    well-defined objects, people, or products in the foreground.
+                  </p>
+                </div>
+              </div>
+              
+              <h3 className="text-xl font-medium text-gray-800 mt-8 mb-4">Design Tips</h3>
+              <div className="grid md:grid-cols-3 gap-6">
+                <div className="bg-purple-50 p-4 rounded-lg">
+                  <h4 className="font-medium text-purple-800">Text Selection</h4>
+                  <p className="text-gray-600 text-sm">
+                    Choose bold, readable fonts that contrast well with your image. Consider text size and spacing 
+                    for maximum impact.
+                  </p>
+                </div>
+                <div className="bg-purple-50 p-4 rounded-lg">
+                  <h4 className="font-medium text-purple-800">Color Choices</h4>
+                  <p className="text-gray-600 text-sm">
+                    Select text colors that complement your image while maintaining readability. Consider using 
+                    colors from your image palette.
+                  </p>
+                </div>
+                <div className="bg-purple-50 p-4 rounded-lg">
+                  <h4 className="font-medium text-purple-800">Composition</h4>
+                  <p className="text-gray-600 text-sm">
+                    Arrange text to create visual flow around your subject. Use the depth effect to enhance 
+                    your image's focal points.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </main>
       </div>
