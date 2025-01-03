@@ -15,15 +15,16 @@ export async function POST(request: Request) {
     }
 
     const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(new Uint8Array(arrayBuffer));
+    if (!(arrayBuffer instanceof ArrayBuffer)) {
+      throw new Error("Invalid file format");
+    }
 
-    const convertedBuffer = Buffer.from(
-      await heicConvert({
-        buffer: buffer,
-        format: format.toUpperCase() as "JPEG" | "PNG",
-        quality: 1,
-      })
-    );
+    const buffer = Buffer.from(new Uint8Array(arrayBuffer));
+    const convertedBuffer = await heicConvert({
+      buffer,
+      format: format.toUpperCase() as "JPEG" | "PNG",
+      quality: 1,
+    });
 
     return new NextResponse(convertedBuffer, {
       headers: {
