@@ -2,7 +2,7 @@ export default function WebApplicationStructuredData() {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
-    name: 'AI Image Tools',
+    name: 'AI Image Tools Online Free',
     applicationCategory: 'ImageEditing',
     operatingSystem: 'Web Browser',
     offers: {
