@@ -2,6 +2,15 @@ import { NextResponse } from 'next/server';
 import heicConvert from 'heic-convert';
 import sharp from 'sharp';
 
+// Define proper types for heicConvert
+type HeicConvertOptions = {
+  buffer: Uint8Array;
+  format: 'JPEG' | 'PNG';
+  quality: number;
+};
+
+type HeicConvertFunction = (options: HeicConvertOptions) => Promise<Buffer>;
+
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
@@ -13,10 +22,10 @@ export async function POST(request: Request) {
     }
 
     const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    const uint8Array = new Uint8Array(arrayBuffer);
 
-    const convertedBuffer = await heicConvert({
-      buffer,
+    const convertedBuffer = await (heicConvert as HeicConvertFunction)({
+      buffer: uint8Array,
       format: format.toUpperCase() as "JPEG" | "PNG",
       quality: 1
     });
