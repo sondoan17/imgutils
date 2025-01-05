@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import Link from 'next/link';
 
 interface HeaderProps {
-  activeFeature?: 'remove-bg' | 'image-conversion' | 'text-behind' | 'image-to-pdf';
+  activeFeature?: 'remove-bg' | 'image-conversion' | 'text-behind' | 'image-to-pdf' | 'blur-unblur';
 }
 
 export default function Header({ activeFeature }: HeaderProps) {
@@ -19,7 +19,7 @@ export default function Header({ activeFeature }: HeaderProps) {
       tools: [
         { name: 'Remove Background', href: '/background-removal', id: 'remove-bg' },
         { name: 'Text Behind Effect', href: '/text-behind', id: 'text-behind' },
-        { name: 'Blur/Unblur Tool', href: '/blur-unblur', soon: true },
+        { name: 'Blur Tool', href: '/blur', id: 'blur' },
       ]
     },
     {
